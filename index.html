@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>对话网页 - 首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFE66D',
+                        dark: '#292F36',
+                        light: '#F7FFF7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-transform-opacity {
+                transition-property: transform, opacity;
+            }
+            .hover-scale {
+                transition: transform 0.3s ease;
+            }
+            .hover-scale:hover {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+    <style>
+        /* 针对不同屏幕比例的媒体查询，确保图片完整显示并在上下填充白边 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            overflow: hidden;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* 按钮样式 */
+        .enter-button {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+        
+        .enter-button:hover {
+            transform: scale(1.1);
+            opacity: 1;
+            animation-play-state: paused;
+        }
+        
+        /* 脉动动画效果 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.03);
+                opacity: 0.95;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* 点击时的动效 */
+        .enter-button:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-light min-h-screen overflow-hidden">
+    <!-- 首页容器 -->
+    <div class="image-container">
+        <!-- 使用img标签展示原图片 -->
+        <img src="./page1/page1.jpg" alt="首页背景">
+        
+        <!-- 添加独立的enter按钮，使用Botton_big enter.png -->
+        <img id="enter-button" class="enter-button" src="./page1/Botton_big enter.png" alt="Enter按钮">
+    </div>
+
+    <script>
+        // 等待页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取enter按钮元素
+            const enterButton = document.getElementById('enter-button');
+            
+            // 获取主背景图片
+            const mainImage = document.querySelector('.image-container img:not(.enter-button)');
+            
+            // 先加载按钮图片获取其宽高比
+            const buttonImage = new Image();
+            buttonImage.src = './page1/Botton_big enter.png';
+            
+            // 计算按钮位置 - 使其与原图中左下角的enter按钮完全一致
+            function positionButton() {
+                // 确保主图片已加载完成并有尺寸信息
+                if (!mainImage.naturalWidth) {
+                    setTimeout(positionButton, 50);
+                    return;
+                }
+                
+                const container = document.querySelector('.image-container');
+                
+                // 获取原始图片的宽高
+                const imgNaturalWidth = mainImage.naturalWidth;
+                const imgNaturalHeight = mainImage.naturalHeight;
+                
+                // 获取原始图片的宽高比
+                const imgRatio = imgNaturalWidth / imgNaturalHeight;
+                const containerRatio = container.clientWidth / container.clientHeight;
+                
+                let scale = 1;
+                let imgDisplayWidth = 0;
+                let imgDisplayHeight = 0;
+                
+                // 确定图片显示的实际尺寸
+                if (imgRatio > containerRatio) {
+                    // 图片更宽，按宽度缩放
+                    imgDisplayWidth = container.clientWidth;
+                    imgDisplayHeight = container.clientWidth / imgRatio;
+                    scale = container.clientWidth / imgNaturalWidth;
+                } else {
+                    // 图片更高，按高度缩放
+                    imgDisplayHeight = container.clientHeight;
+                    imgDisplayWidth = container.clientHeight * imgRatio;
+                    scale = container.clientHeight / imgNaturalHeight;
+                }
+                
+                // 计算图片在容器中的偏移量
+                const imgOffsetX = (container.clientWidth - imgDisplayWidth) / 2;
+                const imgOffsetY = (container.clientHeight - imgDisplayHeight) / 2;
+                
+                // 根据原图片中左下角enter按钮的相对位置设置按钮位置
+                // 根据用户提供的图片，按钮位于左下角
+                // 经过分析，按钮大约占图片宽度的15%，距离底部约18%，距离左侧约18%
+                const buttonWidth = imgNaturalWidth * 0.25 * scale;
+                
+                // 设置按钮位置和大小
+                enterButton.style.width = `${buttonWidth}px`;
+                enterButton.style.height = 'auto';
+                enterButton.style.bottom = `${imgOffsetY + imgDisplayHeight * 0.23}px`; // 距离底部的位置，根据原图调整
+                enterButton.style.left = `${imgOffsetX + imgDisplayWidth * 0.10}px`; // 距离左侧的位置，根据原图调整
+                enterButton.style.transform = 'none'; // 清除之前的transform
+            }
+            
+            // 等待主图片和按钮图片都加载完成后再定位
+            function waitForImagesToLoad() {
+                if (mainImage.complete && buttonImage.complete) {
+                    positionButton();
+                } else {
+                    setTimeout(waitForImagesToLoad, 50);
+                }
+            }
+            
+            // 初始定位按钮
+            waitForImagesToLoad();
+            
+            // 窗口大小改变时重新定位按钮
+            window.addEventListener('resize', positionButton);
+            
+            // 添加点击事件，跳转到第二个页面
+            enterButton.addEventListener('click', function() {
+                // 使用CSS过渡效果
+                document.body.classList.add('opacity-0');
+                setTimeout(() => {
+                    window.location.href = './page2.html';
+                }, 500);
+            });
+            
+            // 添加键盘事件，按下回车键也可以跳转
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    enterButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

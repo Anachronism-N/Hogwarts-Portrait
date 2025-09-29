@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbie Career Support - 第三页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="./page3/chat-api.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFE66D',
+                        dark: '#292F36',
+                        light: '#F7FFF7',
+                        barbiePink: '#FF6EC7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        /* 引入自定义字体 */
+        @font-face {
+            font-family: 'PixelifySans';
+            src: url('/fonts/PixelifySans.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            /* 应用自定义字体到对话框文本 */
+            .chat-text {
+                font-family: 'PixelifySans', sans-serif;
+            }
+        }
+        
+        /* 增强字体应用规则，提高优先级 */
+        #ken-chat div,
+        #barbie-chat div,
+        #ken-chat div *, 
+        #barbie-chat div * {
+            font-family: 'PixelifySans', sans-serif !important;
+            font-size: inherit;
+            line-height: inherit;
+        }
+        
+        /* 确保Vector中的文字颜色为白色 */
+        #user-message-input {
+            color: white !important;
+            font-family: 'PixelifySans', sans-serif !important;
+        }
+        
+        /* 翻页控制按钮样式 */
+        [data-pagination] button {
+            font-family: 'PixelifySans', sans-serif !important;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        [data-pagination] button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        [data-pagination] span {
+            font-family: 'PixelifySans', sans-serif !important;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body class="bg-white min-h-screen overflow-hidden">
+    <!-- 主容器 - 使用flex布局确保内容居中并保持比例 -->
+    <div class="relative w-full h-screen flex items-center justify-center">
+        <!-- 底图背景 - 使用object-contain和背景白边 -->
+        <div id="background-container" class="absolute inset-0 z-0 bg-white">
+            <img id="background-image" src="./page3/page3.jpg" alt="背景" class="w-full h-full object-contain">
+        </div>
+        
+        <!-- 相对底图定位的容器 - 将由JavaScript动态设置位置和大小 -->
+        <div id="map-container" class="absolute z-10 pointer-events-none"></div>
+
+        <!-- 所有需要相对于底图定位的元素都放在map-container内 -->
+        <div id="map-content" class="pointer-events-auto">
+            <!-- 人物 - Barbie -->
+            <div id="barbie" class="absolute top-[26%] left-[69%] z-10">
+                <img src="./page3/barbie.png" alt="Barbie" class="w-[7vw] h-auto max-w-[250px]">
+            </div>
+
+            <!-- 人物 - Ken -->
+            <div id="ken" class="absolute top-[32%] left-[32%] z-10">
+                <img src="./page3/ken.png" alt="Ken" class="w-[8vw] h-auto max-w-[250px]">
+            </div>
+
+            <!-- Ken的对话框 -->
+            <div id="ken-chat" class="absolute top-[20%] left-[36%] z-20">
+                <img src="./page3/ken chat.png" alt="Ken Chat" class="w-[16vw] h-auto max-w-[280px]">
+                <!-- <div class="absolute top-[30%] left-[25%] text-white text-[clamp(0.8rem,1.5vw,1rem)] font-bold text-shadow">
+                    Ken: NOOO! Yes, that's it!
+                </div> -->
+            </div>
+
+            <!-- Barbie的对话框 -->
+            <div id="barbie-chat" class="absolute top-[20%] right-[8%] z-20">
+                <img src="./page3/barbie chat.png" alt="Barbie Chat" class="w-[16vw] h-auto max-w-[280px]">
+                <!-- <div class="absolute top-[30%] left-[20%] text-white text-[clamp(0.8rem,1.5vw,1rem)] font-bold text-shadow">
+                    Barbie: Don't worry girl!<br>I don't think you is the most beautiful
+                </div> -->
+            </div>
+
+            <!-- 用户输入框 -->
+            <!-- 用户输入区域 - 使用Vector.png图片替代输入框 -->
+            <div id="input-container" class="relative w-[80vw] max-w-[600px] absolute top-[83%] left-[60%] transform -translate-x-1/2 z-20">
+                
+                <!-- 输入框背景图 -->
+                <img src="./page3/Vector.png" alt="Input Area" class="w-full h-auto">
+                
+                <!-- 透明输入框 - 长度为Vector的75% -->
+                <input 
+                    id="user-message-input" 
+                    type="text" 
+                    placeholder="feel free to talk everything ..." 
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] bg-transparent border-none focus:outline-none text-white text-[clamp(1rem,2vw,1.2rem)] placeholder-gray-300 font-[PixelifySans]"
+                >
+
+                <!-- 发送按钮 -->
+                <!-- 它现在相对于父容器(input-container)进行绝对定位 -->
+                <div id="send-button" class="absolute top-1/2 right-0 transform translate-x-[-16%] -translate-y-1/2 z-30 cursor-pointer">
+                    <img src="./page3/snend.png" alt="Send" class="w-[17vw] h-auto max-w-[150px] hover:scale-105 transition-transform">
+                </div>
+
+            </div>
+
+            <!-- 后退按钮 -->
+            <div id="back-button" class="absolute bottom-[4%] left-[10%] z-20 cursor-pointer">
+                <img src="./page3/botton_back.png" alt="Back" class="w-[13vw] h-auto max-w-[120px] hover:scale-105 transition-transform">
+            </div>
+        </div>
+    </div>
+
+    <!-- 拖拽功能脚本 - 移到body底部以确保所有DOM元素都已加载 -->
+    <script>
+        // 在页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取底图和地图容器
+            const backgroundImage = document.getElementById('background-image');
+            const mapContainer = document.getElementById('map-container');
+            const mapContent = document.getElementById('map-content');
+            
+            // 将map-content移动到map-container中
+            mapContainer.appendChild(mapContent);
+            
+            // 函数：更新地图容器的位置和大小，使其与底图完全匹配
+            function updateMapContainer() {
+                // 获取底图的实际尺寸和位置
+                const imgRect = backgroundImage.getBoundingClientRect();
+                const containerRect = backgroundImage.parentElement.getBoundingClientRect();
+                
+                // 计算底图在容器中的实际位置（考虑object-contain后的留白）
+                const leftOffset = (containerRect.width - imgRect.width) / 2;
+                const topOffset = (containerRect.height - imgRect.height) / 2;
+                
+                // 设置地图容器的位置和大小，使其与底图完全匹配
+                mapContainer.style.left = `${leftOffset}px`;
+                mapContainer.style.top = `${topOffset}px`;
+                mapContainer.style.width = `${imgRect.width}px`;
+                mapContainer.style.height = `${imgRect.height}px`;
+                
+                // 设置map-content为相对定位，使其内部元素可以相对于底图定位
+                mapContent.style.position = 'relative';
+                mapContent.style.width = '100%';
+                mapContent.style.height = '100%';
+            }
+            
+            // 初始更新一次
+            updateMapContainer();
+            
+            // 当窗口大小改变时重新计算（以适应不同分辨率）
+            window.addEventListener('resize', updateMapContainer);
+            
+            // 确保图片完全加载后再更新一次（避免图片未加载导致尺寸计算错误）
+            backgroundImage.addEventListener('load', updateMapContainer);
+            
+            // 获取所有需要拖拽的元素
+            const draggableElements = [
+                document.getElementById('barbie'),
+                document.getElementById('ken')
+                // 已移除对话框元素，使其固定不允许移动
+            ];
+            
+            // 为每个元素添加拖拽功能
+            draggableElements.forEach(element => {
+                if (element) {
+                    element.style.cursor = 'move';
+                    
+                    // 添加鼠标按下事件监听
+                    element.addEventListener('mousedown', function(e) {
+                        // 阻止事件冒泡，避免触发背景元素的事件
+                        e.stopPropagation();
+                        
+                        // 获取当前元素相对于鼠标位置的偏移量
+                        const offsetX = e.clientX - element.getBoundingClientRect().left;
+                        const offsetY = e.clientY - element.getBoundingClientRect().top;
+                        
+                        // 获取地图容器的位置信息
+                        const mapContainerRect = mapContainer.getBoundingClientRect();
+                        
+                        // 提高当前元素的z-index，确保它在最上层
+                        const originalZIndex = element.style.zIndex;
+                        element.style.zIndex = '100';
+                        
+                        // 添加鼠标移动事件监听
+                        const onMouseMove = function(e) {
+                            // 计算新的位置（相对于地图容器）
+                            const newX = e.clientX - mapContainerRect.left - offsetX;
+                            const newY = e.clientY - mapContainerRect.top - offsetY;
+                            
+                            // 计算相对百分比位置（保持响应式）
+                            const percentX = (newX / mapContainerRect.width) * 100;
+                            const percentY = (newY / mapContainerRect.height) * 100;
+                            
+                            // 设置元素的新位置 - 使用绝对定位和百分比
+                            element.style.position = 'absolute';
+                            element.style.left = `${percentX}%`;
+                            element.style.top = `${percentY}%`;
+                            element.style.right = 'auto';
+                            element.style.bottom = 'auto';
+                            
+                            // 移除任何可能影响定位的transform样式
+                            element.style.transform = 'none';
+                            
+                            // 输出当前位置信息（用于调试）
+                            console.log(`Element ${element.id} moved to: left=${percentX}%, top=${percentY}%`);
+                        };
+                        
+                        // 添加鼠标释放事件监听
+                        const onMouseUp = function() {
+                            // 恢复原始的z-index
+                            element.style.zIndex = originalZIndex;
+                            // 移除临时事件监听
+                            document.removeEventListener('mousemove', onMouseMove);
+                            document.removeEventListener('mouseup', onMouseUp);
+                        };
+                        
+                        // 添加临时事件监听
+                        document.addEventListener('mousemove', onMouseMove);
+                        document.addEventListener('mouseup', onMouseUp);
+                    });
+                }
+            });
+            
+            // 添加后退按钮的点击事件
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', function() {
+                    // 导航回第二页
+                    window.location.href = 'page2.html';
+                });
+            }
+            
+            // 存储会话ID，用于继续对话
+            let conversationId = null;
+            // 对话功能已移至外部文件 chat-api.js
+            // 该文件负责API的发送、接收、解析返回值以及确保文本不超出对话框范围
+            // 查看 chat-api.js 了解更多实现细节
+        });
+    </script>
+</body>
+</html>

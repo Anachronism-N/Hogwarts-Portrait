@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbie Career Support - 第二页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFE66D',
+                        dark: '#292F36',
+                        light: '#F7FFF7',
+                        barbiePink: '#FF6EC7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen overflow-hidden">
+    <!-- 主容器 - 使用flex布局确保内容居中并保持比例 -->
+    <div class="relative w-full h-screen flex items-center justify-center">
+        <!-- 底图背景 - 使用object-contain和背景白边 -->
+        <div id="background-container" class="absolute inset-0 z-0 bg-white">
+            <img id="background-image" src="./page2/page2.jpg" alt="背景" class="w-full h-full object-contain">
+        </div>
+        
+        <!-- 相对底图定位的容器 - 将由JavaScript动态设置位置和大小 -->
+        <div id="map-container" class="absolute z-10 pointer-events-none"></div>
+
+        <!-- 所有需要相对于底图定位的元素都放在map-container内 -->
+        <div id="map-content" class="pointer-events-auto">
+            <!-- 中央池塘 - 使用相对大小单位vw -->
+            <div id="central-pool" class="absolute top-[48%] left-[41%] transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <img src="./page2/pool.png" alt="Pool" class="w-[30vw] h-[30vw] object-contain max-w-[400px] max-h-[400px]">
+            </div>
+
+            <!-- 顶部图片 - 使用相对大小单位vw -->
+            <div id="top-image" class="absolute top-[49%] left-[71%] transform -translate-x-1/2 z-10">
+                <img src="./page2/Starting a New Conversation.png" alt="New Conversation" class="w-[15vw] h-auto hover:scale-105 transition-transform max-w-[180px]">
+            </div>
+
+            <!-- 右上图片 - 使用相对大小单位vw -->
+            <div id="top-right-image" class="absolute top-[56%] left-[85%] transform -translate-x-1/2 z-10">
+                <img src="./page2/Career Suggestions.png" alt="Career Suggestions" class="w-[6vw] h-auto hover:scale-105 transition-transform max-w-[100px]">
+            </div>
+
+            <!-- 底部图片 - 使用相对大小单位vw -->
+            <div id="bottom-image" class="absolute bottom-[12%] left-[20%] transform -translate-x-1/2 z-10">
+                <img src="./page2/knowledge_base.png" alt="Knowledge Base" class="w-[25vw] h-auto hover:scale-105 transition-transform max-w-[350px]">
+            </div>
+
+            <!-- 左下图片 - 使用相对大小单位vw -->
+            <div id="bottom-left-image" class="absolute bottom-[18%] left-[58%] transform translate-y-1/2 z-10">
+                <img src="./page2/back-and-forth conversation.png" alt="Conversation" class="w-[8vw] h-auto hover:scale-105 transition-transform max-w-[120px]">
+            </div>
+
+            <!-- 装饰元素-云朵 - 使用相对大小单位vw -->
+            <div id="cloud-decoration" class="absolute bottom-[82%] left-[12%] transform translate-y-1/2 z-10">
+                <img src="./page2/cloud.png" alt="Cloud" class="w-[32vw] h-auto hover:scale-105 transition-transform max-w-[500px]">
+            </div>
+
+            <!-- 返回按钮 - 使用相对大小和位置 -->
+            <div id="back-button" class="absolute bottom-[2vw] left-[5vw] z-20 cursor-pointer">
+                <img src="./page2/botton_back.png" alt="Back" class="w-[8vw] h-auto hover:scale-105 transition-transform max-w-[120px]">
+            </div>
+
+            <!-- 下一步按钮 - 使用相对大小和位置 -->
+            <div id="next-button" class="absolute bottom-[2vw] right-[5vw] z-20 cursor-pointer">
+                <img src="./page2/BOTTON_NEXT.png" alt="Next" class="w-[8vw] h-auto hover:scale-105 transition-transform max-w-[120px]">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 等待页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取底图和地图容器
+            const backgroundImage = document.getElementById('background-image');
+            const mapContainer = document.getElementById('map-container');
+            const mapContent = document.getElementById('map-content');
+            
+            // 将map-content移动到map-container中
+            mapContainer.appendChild(mapContent);
+            
+            // 函数：更新地图容器的位置和大小，使其与底图完全匹配
+            function updateMapContainer() {
+                // 获取底图的实际尺寸和位置
+                const imgRect = backgroundImage.getBoundingClientRect();
+                const containerRect = backgroundImage.parentElement.getBoundingClientRect();
+                
+                // 计算底图在容器中的实际位置（考虑object-contain后的留白）
+                const leftOffset = (containerRect.width - imgRect.width) / 2;
+                const topOffset = (containerRect.height - imgRect.height) / 2;
+                
+                // 设置地图容器的位置和大小，使其与底图完全匹配
+                mapContainer.style.left = `${leftOffset}px`;
+                mapContainer.style.top = `${topOffset}px`;
+                mapContainer.style.width = `${imgRect.width}px`;
+                mapContainer.style.height = `${imgRect.height}px`;
+                
+                // 设置map-content为相对定位，使其内部元素可以相对于底图定位
+                mapContent.style.position = 'relative';
+                mapContent.style.width = '100%';
+                mapContent.style.height = '100%';
+            }
+            
+            // 初始更新一次
+            updateMapContainer();
+            
+            // 当窗口大小改变时重新计算（以适应不同分辨率）
+            window.addEventListener('resize', updateMapContainer);
+            
+            // 确保图片完全加载后再更新一次（避免图片未加载导致尺寸计算错误）
+            backgroundImage.addEventListener('load', updateMapContainer);
+            
+            // 返回按钮点击事件
+            document.getElementById('back-button').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+
+            // 下一步按钮点击事件
+            document.getElementById('next-button').addEventListener('click', function() {
+                window.location.href = 'page3.html';
+            });
+        });
+    </script>
+</body>
+</html>
